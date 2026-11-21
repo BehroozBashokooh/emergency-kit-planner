@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergency Kit Planner · Noodpakket · Notvorrat · بستهٔ اضطراری</title>
+<meta name="description" content="Multilingual emergency kit planner for the Netherlands and Germany, based on Denk Vooruit and BBK advice.">
+<style>
+  :root {
+    --bg: #f6f5f1; --card: #ffffff; --ink: #1d2421; --muted: #5d6762; --line: #e2e0d8;
+    --accent: #1f6f5c; --accent-ink: #ffffff; --accent-soft: #e3f0eb;
+    --warn: #8a5a00; --warn-soft: #fbf1dc; --radius: 14px;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  :root { color-scheme: light dark; }
+  :root[data-theme=light] { color-scheme: light; }
+  :root[data-theme=dark] { color-scheme: dark; --bg:#141816; --card:#1d2321; --ink:#e8ece9; --muted:#a2aca7; --line:#2d3532;
+            --accent:#5cc2a3; --accent-ink:#0d1512; --accent-soft:#1f302a; --warn:#e8b54a; --warn-soft:#2e2717; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme=light]) { --bg:#141816; --card:#1d2321; --ink:#e8ece9; --muted:#a2aca7; --line:#2d3532;
+            --accent:#5cc2a3; --accent-ink:#0d1512; --accent-soft:#1f302a; --warn:#e8b54a; --warn-soft:#2e2717; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); line-height:1.5; }
+  [dir="rtl"] body, body[dir="rtl"] { font-family: Vazirmatn, Tahoma, "Segoe UI", system-ui, sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 16px 16px 64px; }
+  header.top { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; justify-content:space-between; margin: 8px 0 18px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0; max-width: 56ch; }
+  .pickers { display:flex; gap:10px; flex-wrap:wrap; }
+  label.field { display:flex; flex-direction:column; gap:4px; font-size:.85rem; color:var(--muted); }
+  select, input[type=number], textarea {
+    font: inherit; color: var(--ink); background: var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:8px 10px; min-height:40px;
+  }
+  textarea { width:100%; min-height:180px; resize:vertical; font-size:.9rem; }
+  section.card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin:14px 0; }
+  h2 { font-size:1.1rem; margin:0 0 12px; }
+  h3 { font-size:.95rem; margin:18px 0 8px; color:var(--accent); }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:12px; }
+  .stepper { display:flex; align-items:center; gap:6px; }
+  .stepper button { width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:1.2rem; cursor:pointer; }
+  .stepper input { width:64px; text-align:center; }
+  .hint { font-size:.85rem; color:var(--muted); margin:8px 0 0; }
+  .note { background:var(--warn-soft); color:var(--warn); border-radius:10px; padding:10px 12px; font-size:.88rem; margin:10px 0 0; }
+  fieldset.needs { border:1px solid var(--line); border-radius:12px; margin:16px 0 0; padding:10px 14px 12px; }
+  fieldset.needs legend { font-weight:600; padding:0 6px; font-size:.95rem; }
+  #needs { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:4px 16px; }
+  label.need { display:flex; gap:10px; align-items:flex-start; padding:6px 0; cursor:pointer; }
+  label.need input { width:22px; height:22px; margin-top:1px; accent-color: var(--accent); flex:none; }
+  .stats { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:10px; }
+  .stat { background:var(--accent-soft); border-radius:12px; padding:12px 14px; }
+  .stat .k { font-size:.8rem; color:var(--muted); }
+  .stat .v { font-size:1.35rem; font-weight:650; }
+  .stat .s { font-size:.8rem; color:var(--muted); }
+  ul.items { list-style:none; margin:0; padding:0; }
+  ul.items li { display:flex; gap:10px; align-items:flex-start; padding:9px 2px; border-bottom:1px solid var(--line); }
+  ul.items li:last-child { border-bottom:0; }
+  ul.items input[type=checkbox] { width:22px; height:22px; margin-top:1px; accent-color: var(--accent); flex:none; }
+  ul.items .name { flex:1; }
+  ul.items .qty { white-space:nowrap; font-variant-numeric: tabular-nums; font-weight:600; }
+  ul.items li.have .name { color:var(--muted); text-decoration: line-through; }
+  .badge { display:inline-block; font-size:.7rem; padding:1px 7px; border-radius:99px; border:1px solid var(--line); color:var(--muted); margin-inline-start:6px; vertical-align:1px; }
+  .badge.gov { border-color: var(--accent); color: var(--accent); }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .btn { font:inherit; border-radius:10px; padding:9px 14px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; min-height:42px; }
+  .btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .btn:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .ai { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:8px; margin-top:12px; }
+  .toast { position:fixed; inset-inline:0; bottom:18px; margin:auto; width:max-content; max-width:90vw; background:var(--ink); color:var(--bg); padding:8px 14px; border-radius:10px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .toast.on { opacity:1; }
+  footer { color:var(--muted); font-size:.85rem; }
+  footer a, .src a { color:var(--accent); }
+  .src li { margin:6px 0; }
+  .src .url { color:var(--muted); font-size:.8rem; unicode-bidi:isolate; direction:ltr; }
+  p.emergency { font-weight:650; background:var(--accent-soft); border-radius:10px; padding:10px 12px; margin:0 0 10px; }
+  .printonly { display:none; }
+  @media print {
+    body { background:#fff; color:#000; }
+    .noprint, .pickers, .actions, #aiCard, .stepper button { display:none !important; }
+    .printonly { display:block; }
+    section.card { border:0; padding:0; margin:10px 0; break-inside: avoid-page; }
+    ul.items li { padding:4px 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 id="t_title"></h1>
+      <p class="sub" id="t_subtitle"></p>
+    </div>
+    <div class="pickers">
+      <label class="field"><span id="t_language"></span>
+        <select id="lang" aria-labelledby="t_language"></select>
+      </label>
+      <label class="field"><span id="t_country"></span>
+        <select id="country" aria-labelledby="t_country"></select>
+      </label>
+    </div>
+  </header>
+
+  <p class="printonly" id="printHeader"></p>
+
+  <section class="card noprint" id="householdCard">
+    <h2 id="t_step1"></h2>
+    <div class="grid" id="household"></div>
+    <p class="hint" id="daysHint"></p>
+    <fieldset class="needs">
+      <legend id="t_needs"></legend>
+      <div id="needs"></div>
+    </fieldset>
+  </section>
+
+  <section class="card">
+    <h2 id="t_step2"></h2>
+    <div class="stats" id="stats"></div>
+    <p class="note" id="foodNote"></p>
+  </section>
+
+  <section class="card src">
+    <h2 id="t_sources"></h2>
+    <p class="emergency" id="emergency"></p>
+    <ul id="sources"></ul>
+    <div class="actions noprint"><button class="btn" id="linkBtn" type="button"></button></div>
+  </section>
+  <section class="card">
+    <h2 id="t_step3"></h2>
+    <div id="checklist"></div>
+    <div class="actions noprint">
+      <button class="btn" id="resetBtn" type="button"></button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 id="t_step4"></h2>
+    <ul class="items" id="shopping"></ul>
+    <div class="actions">
+      <button class="btn primary" id="copyBtn" type="button"></button>
+      <button class="btn" id="shareBtn" type="button"></button>
+      <button class="btn" id="printBtn" type="button"></button>
+    </div>
+    <p class="hint" id="reviewTip"></p>
+  </section>
+
+  <section class="card" id="aiCard">
+    <h2 id="t_step5"></h2>
+    <p id="aiIntro"></p>
+    <label class="field" style="color:var(--ink)"><span id="t_promptLabel"></span>
+      <textarea id="prompt" spellcheck="false"></textarea>
+    </label>
+    <div class="ai">
+      <a class="btn primary" data-ai="claude" id="btnClaude" target="_blank" rel="noopener" href="https://claude.ai/new"></a>
+      <a class="btn primary" data-ai="chatgpt" id="btnChatGPT" target="_blank" rel="noopener" href="https://chatgpt.com/"></a>
+      <a class="btn primary" data-ai="gemini" id="btnGemini" target="_blank" rel="noopener" href="https://gemini.google.com/app"></a>
+    </div>
+    <p class="hint" id="aiNote"></p>
+    <p class="hint" id="aiGeminiNote"></p>
+  </section>
+
+
+  <footer><p id="disclaimer"></p></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
