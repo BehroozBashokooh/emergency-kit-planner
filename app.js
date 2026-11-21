@@ -159,7 +159,7 @@
     ];
     $("household").innerHTML = fields.map(([k, label, min, max]) => {
       const v = k === "days" ? S.days[S.country] : S[k];
-      return `<label class="field"><span>${esc(label)}</span>
+      return `<label class="field"><span>${esc(label).replace(/\([^)]*\)/g, (m) => `<span class="nw">${m}</span>`)}</span>
         <div class="stepper">
           <button type="button" data-step="${k}" data-d="-1" aria-label="−">−</button>
           <input type="number" inputmode="numeric" id="f_${k}" data-field="${k}" min="${min}" max="${max}" value="${v}">
