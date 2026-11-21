@@ -128,7 +128,7 @@
     document.documentElement.dir = LANGS[S.lang].dir;
     document.body.dir = LANGS[S.lang].dir;
     document.title = L.title;
-    ["title", "subtitle", "language", "country", "step1", "step2", "step3", "step4", "step5", "sources", "promptLabel"]
+    ["title", "subtitle", "language", "country", "step1", "step2", "step3", "step3Help", "step4", "step5", "sources", "promptLabel"]
       .forEach((k) => { const el = $("t_" + k); if (el) el.textContent = L[k]; });
     $("aiIntro").textContent = L.aiIntro;
     $("aiNote").textContent = L.aiNote;
@@ -205,9 +205,13 @@
         return `<li class="${on ? "have" : ""}">
           <input type="checkbox" id="h_${it.id}" data-have="${it.id}"${on ? " checked" : ""}>
           <label class="name" for="h_${it.id}">${esc(L.items[it.id])}${badge(it.src[S.country])}</label>
-          <span class="qty">${esc(fmtQty(q))}</span></li>`;
+          <span class="qty">${esc(on ? L.haveTag : fmtQty(q))}</span></li>`;
       }).join("") + `</ul>`;
     }).join("");
+
+    const nHave = items.filter((it) => have[it.id]).length;
+    $("haveCount").innerHTML = esc(L.haveCount)
+      .replace("{have}", `<b>${nf(nHave)}</b>`).replace("{total}", nf(items.length)).replace("{buy}", `<b>${nf(items.length - nHave)}</b>`);
 
     // shopping list
     const lines = shoppingLines();
@@ -217,7 +221,7 @@
 
     // print header
     $("printHeader").textContent =
-      `${L.title} — ${L[S.country]} · ${L.adults}: ${S.adults}, ${L.seniors}: ${S.seniors}, ${L.children}: ${S.children}, ${L.babies}: ${S.babies}, ${L.pets}: ${S.pets} · ${nf(c.days)} ${L.sumDays} · ${new Date().toLocaleDateString(LANGS[S.lang].locale)}`;
+      `${[L.title + " — " + L[S.country], `${L.adults}: ${nf(S.adults)}, ${L.seniors}: ${nf(S.seniors)}, ${L.children}: ${nf(S.children)}, ${L.babies}: ${nf(S.babies)}, ${L.pets}: ${nf(S.pets)}`, `${nf(c.days)} ${L.sumDays}`, new Date().toLocaleDateString(LANGS[S.lang].locale)].join(S.lang === "fa" ? "؛ " : " · ")}`;
 
     // AI prompt + links
     $("prompt").value = buildPrompt(S.lang, c, lines.map((l) => l.qty ? `${l.name}: ${l.qty}` : l.name));

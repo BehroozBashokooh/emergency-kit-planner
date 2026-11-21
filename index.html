@@ -65,7 +65,13 @@
   ul.items input[type=checkbox] { width:22px; height:22px; margin-top:1px; accent-color: var(--accent); flex:none; }
   ul.items .name { flex:1; }
   ul.items .qty { white-space:nowrap; font-variant-numeric: tabular-nums; font-weight:600; }
-  ul.items li.have .name { color:var(--muted); text-decoration: line-through; }
+  ul.items li.have { background: color-mix(in srgb, var(--accent) 9%, transparent); border-radius:8px; }
+  ul.items li.have .name { color:var(--muted); }
+  ul.items li.have .qty { color:var(--accent); font-weight:600; }
+  p.help { margin:4px 0 8px; padding:10px 12px; border-inline-start:4px solid var(--accent); border-radius:8px;
+           background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight:500; }
+  p.count { margin:0 0 6px; font-size:.9rem; color:var(--muted); font-variant-numeric: tabular-nums; }
+  p.count b { color:var(--ink); }
   .badge { display:inline-block; font-size:.7rem; padding:1px 7px; border-radius:99px; border:1px solid var(--line); color:var(--muted); margin-inline-start:6px; vertical-align:1px; }
   .badge.gov { border-color: var(--accent); color: var(--accent); }
   .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
@@ -133,6 +139,8 @@
   </section>
   <section class="card">
     <h2 id="t_step3"></h2>
+    <p class="help" id="t_step3Help"></p>
+    <p class="count" id="haveCount" aria-live="polite"></p>
     <div id="checklist"></div>
     <div class="actions noprint">
       <button class="btn" id="resetBtn" type="button"></button>
